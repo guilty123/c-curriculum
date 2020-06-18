@@ -1,0 +1,280 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#define N 15
+int M=0;
+
+struct stu
+{
+	char name[7];
+	char addr[13];
+	char zip[7];
+	char email[14];
+	int qq;
+	char phone_num[12];//解决11位溢出问题
+}boo[N], s;
+
+char title[81];
+
+void read()
+{
+	int i = 0;
+	FILE* fp = fopen("E:\\JK0310.txt", "r");
+	if (fp == NULL)
+	{
+		printf("文件打开失败\n");
+		exit(1);
+	}
+	fgets(title, 80, fp);
+	printf("%s", title);//fputs(title,fp);
+	while (!feof(fp))
+	{
+		fscanf(fp, "%s%s%s%s%d%s", boo[i].name, boo[i].addr, boo[i].zip, boo[i].email, &boo[i].qq, &boo[i].phone_num);
+		i++;
+		M++;
+	}
+	fclose(fp);
+}
+void display()//显示全部功能
+{
+
+
+	for (int j = 0; j < M; j++)
+	{
+		printf("%-8s%-16s%-8s%-16s%-8d%10s\n", boo[j].name, boo[j].addr, boo[j].zip, boo[j].email, boo[j].qq, boo[j].phone_num);
+	}
+
+}
+
+void query_name()
+{
+	int i;
+	char name[7];
+	printf("请输入你要查询的姓名:\n");
+	scanf("%s", name);
+	for (i = 0; i < M; i++)
+	{
+		s = boo[i];
+		if (strcmp(name, s.name) == 0)
+		{
+			printf("%-8s%-16s%-8s%-16s%-8d%10s\n", boo[i].name, boo[i].addr, boo[i].zip, boo[i].email, boo[i].qq, boo[i].phone_num);
+			break;
+		}
+	}
+	if (i == M)
+		printf("查无此人\n");
+}
+void sorting()
+{
+	
+	int i,j,k;
+	//排序
+	for(i=0;i<M;i++)
+	{
+		s=boo[i];
+		k=i;
+		for(int j=i+1;j<M;j++)
+		{
+			if(strcmp(boo[k].name,boo[j].name)>0)
+			{
+				k=j;
+				
+			}
+		}
+		if(k!=j)
+		{
+			s=boo[i];
+				boo[i]=boo[k];
+				boo[k]=s;
+		}
+	}
+	display();
+
+
+}
+void add()
+{//提醒用户输入数据
+	//用户输入数据（关键字)
+	//查询该关键字是否存在，不存在继续输入
+	int i,j,k;
+	char name[7];
+	//数组是否为满
+	printf("请输入你要插入的位置：\n");
+	scanf("%d", &j);
+	printf("请输入要添加的姓名");
+	scanf("%s", name);
+	for (i = 0; i < M; i++)
+	{
+		s = boo[i];
+		if (strcmp(name, s.name) == 0)
+		{
+			printf("姓名已经存在,无法添加");
+			break;
+		}
+	}
+	//结构体数组满，输入数字错误
+	if (M - 1 == N)
+	{
+		printf("结构体数组已满\n");
+		return;
+	}
+	if (j <= 0 || j > M + 1)
+	{
+		printf("插入数据位置数错误\n"); return;
+	}
+	for (k = M - 1; k >= j - 1; k--)
+		boo[k + 1] = boo[k];
+
+	if (i == M)
+	{
+		printf("请输入地址:");
+		scanf("%s", s.addr);
+		printf("请输入邮编:");
+		scanf("%s", s.zip);
+		printf("请输入Email:");
+		scanf("%s", s.email);
+		printf("请输入QQ:");
+		scanf("%d", &s.qq);
+		printf("请输入电话号码");
+		scanf("%s", s.phone_num);
+		strcpy(s.name, name);
+
+
+
+
+		boo[j-1] = s;
+		M++;
+		display();
+		//
+
+	}
+}
+void update()
+{
+	int j,i,k=0;
+	char name[7],number[N];
+	printf("请输入你要修改号码人的姓名：\n");
+	scanf("%s",name);
+	for ( i = 0; i < M; i++)
+	{
+		if (strcmp(name, boo[i].name) == 0)
+		{
+			printf("姓名存在,请输入电话号码：\n");
+			j=i;
+			break;
+		}
+	}
+	if(i==M)
+	{
+		printf("姓名不存在\n");
+		exit(0);
+	}
+	scanf("%s",&number);
+	if(strlen(number)!=11)
+	{
+		printf("非法输入，请重新尝试\n");
+	}
+	else
+	{
+		strcpy(boo[j].phone_num,number);
+		printf("修改成功\n");
+		FILE *ftp = fopen("E:\\12.txt", "w");
+		if (ftp == NULL)
+		{
+			printf("文件打开失败\n");
+			exit(1);
+		}
+		fputs(title,ftp);
+		while(!feof(ftp))
+		{
+			fprintf(ftp, "%s\t%s\t%s\t%s\t%d\t%s\n", boo[k].name, boo[k].addr, boo[k].zip, boo[k].email, &boo[k].qq, &boo[k].phone_num);
+            k++;
+		}
+		fclose(ftp);
+
+
+	}
+
+
+
+}
+void del()
+{
+	int j,i;
+	char name[7];
+	printf("请输入你要删除的姓名\n");
+	scanf("%s",name);
+	for ( i = 0; i < M; i++)
+	{
+		if (strcmp(name, boo[i].name) == 0)
+		{
+			printf("姓名存在,已删除\n");
+			j=i;
+			break;
+		}
+	}
+	if(i==M)
+	{
+		printf("姓名不存在\n");
+		exit(0);
+
+	}
+	for(int k=j;k<M;k++)
+	{
+		boo[k]=boo[k+1];
+
+	}
+	M--;
+	display();
+
+
+}
+
+
+
+void lookup()
+{
+	int i;
+	printf("****查询显示功能****\n");
+	printf("****1.姓名查询****\n");
+	printf("****2.显示全部****\n");
+	printf("****3.返回上一级****\n");
+	printf("请输入（1~3）\n");
+	scanf("%d", &i);
+	switch (i)
+	{
+	case 1:query_name(); break;
+	case 2:display(); break;
+	case 3: break;
+	default:printf("数字输入错误");
+	}
+}
+
+
+int main()
+{
+	read();
+	display();
+	int i;
+	while (1)
+	{
+		printf("***个人通讯录管理系统***\n");
+		printf("***1.查询 2.排序***\n");
+		printf("***3.添加 4.修改***\n");
+		printf("***5.删除 6.退出***\n");
+		printf("输入你的选择:\n");
+		scanf("%d", &i);
+		switch (i)
+		{
+		case 1:lookup(); break;
+		case 2:sorting(); break;
+		case 3:add(); break;
+		case 4:update(); break;
+		case 5:del(); break;
+		case 6:exit(0);
+		default:printf("输入出错，请重新输入\n");
+		}
+	}
+
+	return 0;
+}
